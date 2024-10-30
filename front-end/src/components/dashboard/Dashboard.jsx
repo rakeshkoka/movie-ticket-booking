@@ -2,7 +2,7 @@
 
 function Dashboard() {
   return (
-    <div>Home Homee Dashboard</div>
+    <div>Home Homee Heisen Dashboard</div>
   )
 }
 

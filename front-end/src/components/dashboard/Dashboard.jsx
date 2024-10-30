@@ -2,7 +2,7 @@
 
 function Dashboard() {
   return (
-    <div>Home Dashboard</div>
+    <div>Home Homee Dashboard</div>
   )
 }
 

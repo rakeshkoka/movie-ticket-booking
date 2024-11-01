@@ -78,45 +78,47 @@ const Register = () => {
     };
 
     return (
-        <form className="w-25 m-auto my-5 shadow p-3" onSubmit={handleSubmit} >
-            <div className='mb-3' >
-                <h1 className='fs-2 text-center' >Register Here..</h1>
+        <form className="w-25 m-auto my-5 p-3" style={{ boxShadow: '0 0 5px rgba(255, 255, 255, 0.2)' }} onSubmit={handleSubmit} >
+            <div className='mb-3 ' >
+                <h1 className='fs-2 text-center text-text-highlight' >Register Here..</h1>
             </div>
-            <div className="mb-3" >
+            <div className="mb-3 text-light" >
                 <label htmlFor="" className="form-label" >First Name</label>
                 <input className="form-control" name="firstname" type="text" value={firstname} onChange={handleChange} required />
             </div>
 
-            <div className="mb-3" >
+            <div className="mb-3 text-light" >
                 <label htmlFor="" className="form-label" >Last Name</label>
                 <input className="form-control" name="lastname" type="text" value={lastname} onChange={handleChange} required />
             </div>
 
-            <div className="mb-3" >
+            <div className="mb-3 text-light" >
                 <label htmlFor="" className="form-label" >UserName</label>
                 <input className="form-control" name="username" type="text" value={username} onChange={handleChange} required />
             </div>
 
-            <div className="mb-3" >
+            <div className="mb-3 text-light" >
                 <label htmlFor="" className="form-label" >Email</label>
                 <input className="form-control" name="email" type="email" value={email}
                     pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$" onChange={handleChange} required />
             </div>
 
 
-            <div className="mb-3" >
+            <div className="mb-3 text-light" >
                 <label htmlFor="" className="form-label" >Password</label>
                 <input className="form-control" name="password" type="password" value={password} onChange={handleChange} required />
             </div>
 
-            <div className="mb-3" >
+            <div className="mb-3 text-light" >
                 <label htmlFor="" className="form-label" >Confirm Password</label>
                 <input className="form-control" name="confirmpwd" type="password" value={confirmpwd} onChange={handleChange} required />
 
                 {confirmpwd && password !== confirmpwd ? <div className="form-text text-danger ">Password and ConfirmPassword Should be same</div> : null}
             </div>
 
-            <button type="submit" className="btn btn-primary">Submit</button>
+            <div className='flex justify-center items-center w-100 my-2' >
+                <button type="submit" className="btn w-100" style={{ color: '#FFFFFF', backgroundColor: '#FF4A57' }}>Register</button>
+            </div>
 
             {/* message */}
             {showMessage && (

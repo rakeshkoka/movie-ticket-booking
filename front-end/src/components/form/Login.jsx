@@ -53,22 +53,24 @@ function Login() {
     };
 
     return (
-        <form className="w-25 m-auto my-5 shadow p-3" onSubmit={handleSubmit} >
+        <form className="w-25 m-auto my-5 p-3" style={{boxShadow: '0 0 5px rgba(255, 255, 255, 0.2)'}} onSubmit={handleSubmit} >
             <div className='mb-3' >
-                <h1 className='fs-2 text-center' >Login Here..</h1>
+                <h1 className='fs-2 text-center text-text-highlight text-color' >Login Here..</h1>
             </div>
 
-            <div className="mb-3" >
+            <div className="mb-3 text-light" >
                 <label htmlFor="" className="form-label">User Name</label>
                 <input type="text" className="form-control" name="username" value={username} onChange={handleChange} />
             </div>
 
-            <div className="mb-3">
+            <div className="mb-3 text-light">
                 <label htmlFor="" className="form-label">Password</label>
                 <input type="password" className="form-control" name="password" value={password} onChange={handleChange} />
             </div>
 
-            <button type="submit" className="btn btn-success">Login</button>
+            <div className='flex justify-center items-center w-100 my-2' >
+                <button type="submit" className="btn w-100" style={{ color: '#FFFFFF', backgroundColor: '#FF4A57' }}>Login</button>
+            </div>
 
             {error && <p className="text-danger" >{error}</p>}
         </form>

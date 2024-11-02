@@ -7,9 +7,8 @@ const Register = () => {
     const navigate = useNavigate();
 
     const [data, setData] = useState({
-        firstname: '',
-        lastname: '',
-        username: '',
+        fullname: '',
+        phone: '',
         email: '',
         password: '',
         confirmpwd: ''
@@ -19,16 +18,26 @@ const Register = () => {
 
     const [showMessage, setShowMessage] = useState(false);
 
-    const { firstname, lastname, username, email, password, confirmpwd } = data;
+    const { fullname, phone, email, password, confirmpwd } = data;
 
     const handleChange = (e) => {
 
         const { name, value } = e.target;
 
         // Check for the 'name' field: Prevent numbers
-        if (name === 'firstname' || name === 'lastname') {
+        if (name === 'fullname') {
             if (/[0-9]/.test(value)) {
                 setErrors({ ...errors, [name]: 'Name cannot contain numbers' });
+                return; // Exit if there's an error
+            } else {
+                setErrors({ ...errors, [name]: '' }); // Clear error if valid
+            }
+        }
+
+        // Check for the 'phone' field: Prevent starting with digits 0-5 or length > 10
+        if (name === 'phone') {
+            if (/^[0-5]/.test(value) || value.length > 10) {
+                setErrors({ ...errors, [name]: 'Phone number cannot start with 0-5 or exceed 10 characters' });
                 return; // Exit if there's an error
             } else {
                 setErrors({ ...errors, [name]: '' }); // Clear error if valid
@@ -67,9 +76,8 @@ const Register = () => {
             .catch(err => console.log(err.response.data));
 
         setData({
-            firstname: '',
-            lastname: '',
-            username: '',
+            fullname: '',
+            phone: '',
             email: '',
             password: '',
             confirmpwd: ''
@@ -83,18 +91,25 @@ const Register = () => {
                 <h1 className='fs-2 text-center text-text-highlight' >Register Here..</h1>
             </div>
             <div className="mb-3 text-light" >
-                <label htmlFor="" className="form-label" >First Name</label>
-                <input className="form-control" name="firstname" type="text" value={firstname} onChange={handleChange} required />
+                <label htmlFor="" className="form-label" >Full Name</label>
+                <input className="form-control" name="fullname" type="text" value={fullname} onChange={handleChange} required />
             </div>
-
+            {/* 
             <div className="mb-3 text-light" >
                 <label htmlFor="" className="form-label" >Last Name</label>
                 <input className="form-control" name="lastname" type="text" value={lastname} onChange={handleChange} required />
-            </div>
+            </div> */}
 
-            <div className="mb-3 text-light" >
+            {/* <div className="mb-3 text-light" >
                 <label htmlFor="" className="form-label" >UserName</label>
                 <input className="form-control" name="username" type="text" value={username} onChange={handleChange} required />
+            </div> */}
+
+            <div className="mb-3 text-text-light" >
+                <label htmlFor="" className="form-label" >Mobile</label>
+                <input className="form-control" name="phone" type="number" value={phone} onChange={handleChange} />
+
+                {phone && phone.length < 10 ? <div className="form-text text-danger" >Number must be less than 10 digit</div> : null}
             </div>
 
             <div className="mb-3 text-light" >

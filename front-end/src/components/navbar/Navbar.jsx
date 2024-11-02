@@ -1,6 +1,21 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 function Navbar() {
+
+    const { loggedIn, logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+
+        const confirmLogout = window.confirm('Are you sure you want to log out?');
+
+        if (confirmLogout) {
+            logout();
+        }
+        navigate('/login');
+    };
+
     return (
         <div className="bg-gray-800 h-16">
             <nav className="mx-24">
@@ -33,12 +48,25 @@ function Navbar() {
 
                     {/* buttons */}
                     <div className="hidden md:flex space-x-4">
-                        <Link to="/login" className="text-text-highlight bg-accent-blue hover:bg-blue-600 px-4 py-2 rounded">
-                            Login
-                        </Link>
-                        <Link to="/register" className="text-text-highlight bg-accent-red hover:bg-red-600 px-4 py-2 rounded">
-                            Register
-                        </Link>
+                        {loggedIn ? (
+                            <>
+                                <button onClick={handleLogout} className="text-text-highlight bg-accent-red hover:bg-red-600 px-4 py-2 rounded">
+                                    Logout
+                                </button>
+                                <Link to="/profile" className="text-text-highlight bg-accent-blue hover:bg-blue-600 px-4 py-2 rounded">
+                                    Profile
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                <Link to="/login" className="text-text-highlight bg-accent-blue hover:bg-blue-600 px-4 py-2 rounded">
+                                    Login
+                                </Link>
+                                <Link to="/register" className="text-text-highlight bg-accent-red hover:bg-red-600 px-4 py-2 rounded">
+                                    Register
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </nav>

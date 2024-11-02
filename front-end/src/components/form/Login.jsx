@@ -1,17 +1,19 @@
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useAuth } from "../../context/AuthContext";
 
 function Login() {
 
     const navigate = useNavigate();
 
-    const [data, setData] = useState({ username: '', password: '' });
+    const {login} = useAuth();
+
+    const [data, setData] = useState({ fullname: '', password: '' });
 
     const [error, setError] = useState('');
 
-    const { username, password } = data;
+    const { fullname, password } = data;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -30,12 +32,12 @@ function Login() {
         axios.post('http://localhost:5000/login', data)
             .then(res => {
                 console.log(res);
-
                 if (res.data.success) {
                     setError('');
-                    navigate('/dashboard');
+                    login();
+                    navigate('/');
                 } else {
-                    setError(res.data.message || 'Invalid UserName or Password');
+                    setError(res.data.message || 'Invalid fullname or Password');
                 }
             })
             .catch(err => {
@@ -49,7 +51,7 @@ function Login() {
                 }
             });
 
-        setData({ username: '', password: '' });
+        setData({ fullname: '', password: '' });
     };
 
     return (
@@ -60,7 +62,7 @@ function Login() {
 
             <div className="mb-3 text-light" >
                 <label htmlFor="" className="form-label">User Name</label>
-                <input type="text" className="form-control" name="username" value={username} onChange={handleChange} />
+                <input type="text" className="form-control" name="fullname" value={fullname} onChange={handleChange} />
             </div>
 
             <div className="mb-3 text-light">

@@ -1,0 +1,8 @@
+.anchors-con a{
+    font-size: 11px;
+    color: #7F7F7F;
+}
+
+.anchors-con a:hover{
+    color: white;
+}

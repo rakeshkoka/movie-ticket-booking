@@ -33,6 +33,10 @@ function Login() {
             .then(res => {
                 console.log(res);
                 if (res.data.success) {
+
+                    const token = res.data.token;
+                    localStorage.setItem('token', token);
+
                     setError('');
                     login();
                     navigate('/');

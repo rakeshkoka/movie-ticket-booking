@@ -1,4 +1,5 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 function Profile() {
 
@@ -20,12 +21,49 @@ function Profile() {
         }));
     };
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await axios.put('/profile', userData, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}` // Assuming you use JWT
+                }
+            });
+            if (response.data.success) {
+                alert('Profile updated successfully!');
+                setIsEditing(false); // Exit edit mode after successful update
+            }
+        } catch (error) {
+            console.error("Error updating profile:", error);
+        }
+    };
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+            try {
+                const response = await axios.get('http://localhost:5000/profile', {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Set token in Authorization header
+                    },
+                });
+                console.log(response.data);
+                setUserData(response.data); // Store profile data in state
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+
+        fetchProfile();
+    }, []);
+
     return (
         <div className="text-text-light mx-auto mt-14" style={{ width: '500px', height: 'auto' }} >
 
             <h2>User Profile</h2>
 
-            <form action="">
+            <form action="" onSubmit={handleSubmit}>
 
                 <label className="input input-bordered flex items-center gap-2">
                     <svg
@@ -85,6 +123,7 @@ function Profile() {
                         placeholder="Mobile Number"
                         pattern="[0-9]{10}" // Optional: restrict to a 10-digit number
                         maxLength="10" // Optional: limit to 10 digits
+                        value={userData.phone}
                         name="phone"
                         onChange={handleChange}
                         disabled={!isEditing}
@@ -112,6 +151,12 @@ function Profile() {
                         disabled={!isEditing}
                     />
                 </label>
+
+                {isEditing ? (
+                    <button type="submit" >Save Changes</button>
+                ) : (
+                    <button type="button" onClick={() => setIsEditing(true)} >Edit Profile</button>
+                )}
 
             </form>
         </div>

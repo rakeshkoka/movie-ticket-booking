@@ -2,6 +2,9 @@ const express = require('express');
 const mySql = require('mysql');
 const cors = require('cors');
 
+const jwt = require('jsonwebtoken');
+const secretKey = 'a8cc1ff8f4bc3b7b4d7611509c97f4b6e5836962f24c2c014453838e6aaa348e';
+
 const app = express();
 const port = 5000;
 
@@ -52,7 +55,23 @@ app.post('/login', (req, res) => {
             const user = result[0];
             console.log(user);
             if (user.password === password) {
-                return res.status(200).json({ success: true, message: 'Login successful' })
+
+                //creating jwt on successful login
+                // const token = jwt.sign(
+                //     { id: user.id, fullname: user.fullname },
+                //     secretKey,
+                //     { expiresIn: '1h' }
+                // );
+                const token = jwt.sign({
+                    id: user.id,
+                    fullname: user.fullname,
+                    email: user.email,
+                    phone: user.phone,
+                    password: user.password // Avoid storing sensitive data like passwords in tokens if possible
+                }, secretKey, { expiresIn: '1h' });
+
+
+                return res.status(200).json({ success: true, message: 'Login successful', token })
             } else {
                 return res.status(401).json({ success: false, message: 'Invalid password' });
             }
@@ -61,6 +80,49 @@ app.post('/login', (req, res) => {
         }
     });
 });
+
+
+// Middleware to check if JWT is valid
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // "Bearer TOKEN"
+
+    if (!token) return res.status(401).json({ message: 'Access denied. No token provided.' });
+
+    jwt.verify(token, secretKey, (err, user) => {
+        if (err) return res.status(403).json({ message: 'Invalid token.' });
+        req.user = user; // Attach user info to the request
+        next(); // Pass control to the next handler
+    });
+}
+
+// Protected profile route
+app.get('/profile', authenticateToken, (req, res) => {
+    // Simulate fetching user data from the database
+    const userData = {
+        id: req.user.id,
+        fullname: req.user.fullname,
+        email: req.user.email,
+        phone: req.user.phone,
+        password: req.user.password
+    };
+    res.json(userData);
+});
+
+// PUT Update User Profile
+app.put('/profile', (req, res) => {
+    const { firstName, lastName, email, phone } = req.body;
+    const userId = req.user.id; // Get user ID from JWT or session
+    const query = `UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ? WHERE id = ?`;
+    db.query(query, [firstName, lastName, email, phone, userId], (err, result) => {
+        if (err) {
+            res.status(500).json({ error: "Failed to update profile" });
+        } else {
+            res.json({ success: true, message: "Profile updated successfully" });
+        }
+    });
+});
+
 
 app.listen(port, () => {
     console.log(`Server is running at port ${port}`);

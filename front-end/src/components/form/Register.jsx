@@ -137,8 +137,8 @@ const Register = () => {
 
             {/* message */}
             {showMessage && (
-                <div className="alert alert-success mt-3">
-                    Registration successful! Redirecting to login...
+                <div className="alert alert-success mt-3 border border-white">
+                    <h1 className='text-text-highlight' >Registration successful! Redirecting to login...</h1>
                 </div>
             )}
 

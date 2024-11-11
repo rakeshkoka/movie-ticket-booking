@@ -10,6 +10,13 @@ function Profile() {
         password: ''
     });
 
+    const [originalUserData, setOriginalUserData] = useState({
+        fullname: '',
+        phone: '',
+        email: '',
+        password: ''
+    });
+
     const [isEditing, setIsEditing] = useState(false);
 
     const handleChange = (e) => {
@@ -24,18 +31,53 @@ function Profile() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        try {
-            const response = await axios.put('/profile', userData, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}` // Assuming you use JWT
+        const updatedData = {};
+
+        // Check for changes and add only modified fields
+        if (userData.fullname !== originalUserData.fullname) {
+            updatedData.fullname = userData.fullname;
+        }
+        if (userData.email !== originalUserData.email) {
+            updatedData.email = userData.email;
+        }
+        if (userData.phone !== originalUserData.phone) {
+            updatedData.phone = userData.phone;
+        }
+        if (userData.password !== originalUserData.password) {
+            updatedData.password = userData.password;
+        }
+
+        // If there are any modified fields, send them to the backend
+        if (Object.keys(updatedData).length > 0) {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await axios.put('http://localhost:5000/profile', updatedData, {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Set token in Authorization header
+                    },
+                });
+
+                if (response.data.success) {
+                    alert('Profile updated successfully!');
+                    setIsEditing(false); // Exit edit mode after successful update
+
+                    // Update user data with the response data from the backend
+                    setUserData({
+                        ...userData,
+                        ...updatedData
+                    });
+
+                    // Update original user data to reflect changes
+                    setOriginalUserData({
+                        ...userData,
+                        ...updatedData
+                    });
                 }
-            });
-            if (response.data.success) {
-                alert('Profile updated successfully!');
-                setIsEditing(false); // Exit edit mode after successful update
+            } catch (error) {
+                console.error("Error updating profile:", error);
             }
-        } catch (error) {
-            console.error("Error updating profile:", error);
+        } else {
+            alert("No changes detected!");
         }
     };
 
@@ -48,8 +90,8 @@ function Profile() {
                         Authorization: `Bearer ${token}`, // Set token in Authorization header
                     },
                 });
-                console.log(response.data);
                 setUserData(response.data); // Store profile data in state
+                setOriginalUserData(response.data); // Store the original user data
             } catch (error) {
                 console.error("Error fetching user data:", error);
             }
@@ -63,7 +105,7 @@ function Profile() {
 
             <h2>User Profile</h2>
 
-            <form action="" onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}>
 
                 <label className="input input-bordered flex items-center gap-2">
                     <svg
@@ -135,32 +177,49 @@ function Profile() {
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 16 16"
                         fill="currentColor"
-                        className="h-4 w-4 opacity-70">
+                        className="h-5 w-5 opacity-70">
                         <path
-                            fillRule="evenodd"
-                            d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
-                            clipRule="evenodd" />
+                            d="M11 2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h6Zm0 1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z" />
                     </svg>
                     <input
                         type="password"
                         className="grow"
-                        value={userData.password}
                         placeholder="Password"
                         name="password"
+                        value={userData.password}
                         onChange={handleChange}
                         disabled={!isEditing}
                     />
                 </label>
 
-                {isEditing ? (
-                    <button type="submit" >Save Changes</button>
+                {!isEditing ? (
+                    <button
+                        type="button"
+                        className="btn mt-4 bg-accent text-white"
+                        onClick={() => setIsEditing(true)}
+                    >
+                        Edit Profile
+                    </button>
                 ) : (
-                    <button type="button" onClick={() => setIsEditing(true)} >Edit Profile</button>
+                    <>
+                        <button type="submit" className="btn mt-4 bg-accent text-white">
+                            Save Changes
+                        </button>
+                        <button
+                            type="button"
+                            className="btn mt-4 ml-4 bg-gray-500 text-white"
+                            onClick={() => {
+                                setUserData(originalUserData);
+                                setIsEditing(false);
+                            }}
+                        >
+                            Cancel
+                        </button>
+                    </>
                 )}
-
             </form>
         </div>
-    )
+    );
 }
 
-export default Profile
+export default Profile;

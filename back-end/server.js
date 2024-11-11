@@ -110,18 +110,61 @@ app.get('/profile', authenticateToken, (req, res) => {
 });
 
 // PUT Update User Profile
-app.put('/profile', (req, res) => {
-    const { firstName, lastName, email, phone } = req.body;
+// app.put('/profile', authenticateToken, (req, res) => {
+//     const { fullname, password, email, phone } = req.body;
+//     const userId = req.user.id; // Get user ID from JWT or session
+//     const query = `UPDATE users SET fullname = ?, email = ?, password = ?, phone = ? WHERE id = ?`;
+//     server.query(query, [fullname, email, password, phone, userId], (err, result) => {
+//         if (err) {
+//             console.log("Database Error:", err);
+//             res.status(500).json({ error: "Failed to update profile" });
+//         } else {
+//             res.json({ success: true, message: "Profile updated successfully" });
+//         }
+//     });
+// });
+app.put('/profile', authenticateToken, (req, res) => {
+    const { fullname, email, password, phone } = req.body;
     const userId = req.user.id; // Get user ID from JWT or session
-    const query = `UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ? WHERE id = ?`;
-    db.query(query, [firstName, lastName, email, phone, userId], (err, result) => {
+
+    // Build the query dynamically based on the provided fields
+    let query = "UPDATE users SET";
+    let values = [];
+
+    if (fullname) {
+        query += " fullname = ?,";
+        values.push(fullname);
+    }
+    if (email) {
+        query += " email = ?,";
+        values.push(email);
+    }
+    if (password) {
+        query += " password = ?,";
+        values.push(password);
+    }
+    if (phone) {
+        query += " phone = ?,";
+        values.push(phone);
+    }
+
+    // Remove trailing comma
+    query = query.slice(0, -1);  // Remove last comma
+    query += " WHERE id = ?";    // Always update for the logged-in user
+
+    values.push(userId);  // Add the userId at the end of the values array
+
+    // Execute the query
+    server.query(query, values, (err, result) => {
         if (err) {
+            console.log("Database Error:", err);
             res.status(500).json({ error: "Failed to update profile" });
         } else {
             res.json({ success: true, message: "Profile updated successfully" });
         }
     });
 });
+
 
 
 app.listen(port, () => {

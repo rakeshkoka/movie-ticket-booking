@@ -97,17 +97,48 @@ function authenticateToken(req, res, next) {
 }
 
 // Protected profile route
-app.get('/profile', authenticateToken, (req, res) => {
-    // Simulate fetching user data from the database
-    const userData = {
-        id: req.user.id,
-        fullname: req.user.fullname,
-        email: req.user.email,
-        phone: req.user.phone,
-        password: req.user.password
+app.get('/profile', authenticateToken, async (req, res) => {
+    const query = "SELECT * FROM users WHERE id = ?";
+
+    // Wrapping the query in a promise
+    const queryPromise = (sql, params) => {
+        return new Promise((resolve, reject) => {
+            server.query(sql, params, (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(results);
+                }
+            });
+        });
     };
-    res.json(userData);
+
+    try {
+        // Await the query promise
+        const result = await queryPromise(query, [req.user.id]);
+
+        if (!result.length) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const user = result[0]; // Assuming only one user is returned
+        const userData = {
+            id: user.id,
+            fullname: user.fullname,
+            email: user.email,
+            phone: user.phone,
+            password: user.password,
+        };
+
+        console.log("userData", userData);
+        res.json(userData); // Send the user data as a response
+    } catch (error) {
+        console.error('Error fetching profile:', error);
+        res.status(500).json({ message: 'Error fetching profile data', error });
+    }
 });
+
+
 
 // PUT Update User Profile
 // app.put('/profile', authenticateToken, (req, res) => {

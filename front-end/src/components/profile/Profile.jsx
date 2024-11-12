@@ -28,6 +28,29 @@ function Profile() {
         }));
     };
 
+    // fetch profile
+    const fetchProfile = async () => {
+        const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+        // console.log(token);
+        try {
+            const response = await axios.get('http://localhost:5000/profile', {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Set token in Authorization header
+                },
+            });
+            console.log(response.data);
+            setUserData(response.data); // Store profile data in state
+            setOriginalUserData(response.data); // Store the original user data
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchProfile();
+    }, []);
+
+    // submit function
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -62,16 +85,16 @@ function Profile() {
                     setIsEditing(false); // Exit edit mode after successful update
 
                     // Update user data with the response data from the backend
-                    setUserData({
-                        ...userData,
+                    setUserData((prevData) => ({
+                        ...prevData,
                         ...updatedData
-                    });
+                    }));
 
                     // Update original user data to reflect changes
-                    setOriginalUserData({
-                        ...userData,
+                    setOriginalUserData((prevData) => ({
+                        ...prevData,
                         ...updatedData
-                    });
+                    }));
                 }
             } catch (error) {
                 console.error("Error updating profile:", error);
@@ -81,24 +104,7 @@ function Profile() {
         }
     };
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            const token = localStorage.getItem('token'); // Retrieve the token from localStorage
-            try {
-                const response = await axios.get('http://localhost:5000/profile', {
-                    headers: {
-                        Authorization: `Bearer ${token}`, // Set token in Authorization header
-                    },
-                });
-                setUserData(response.data); // Store profile data in state
-                setOriginalUserData(response.data); // Store the original user data
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            }
-        };
 
-        fetchProfile();
-    }, []);
 
     return (
         <div className="text-text-light mx-auto mt-14" style={{ width: '500px', height: 'auto' }} >
